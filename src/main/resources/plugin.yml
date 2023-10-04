@@ -1,0 +1,10 @@
+name: ZooFee
+version: '${project.version}'
+main: org.example.elwarriorcito.zoofee.ZooFee
+api-version: '1.20'
+
+commands:
+  ZooSpawn:
+    aliases: [zs, zoospawn]
+    description: Spawn a mob
+    usage: /<command>

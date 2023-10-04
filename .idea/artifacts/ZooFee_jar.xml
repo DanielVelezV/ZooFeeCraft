@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="ZooFee:jar">
+    <output-path>$USER_HOME$/Desktop/Server/plugins</output-path>
+    <root id="archive" name="ZooFee.jar">
+      <element id="module-output" name="ZooFee" />
+    </root>
+  </artifact>
+</component>
