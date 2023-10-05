@@ -101,8 +101,8 @@ public abstract class ZooFeeAnimalMilkable extends ZooFeeAnimal{
     //region Event Handlers
     public void onPlayerMilkEvent(Player player, Entity MilkedEntity){
         if(this.entity.equals(MilkedEntity)){
-            if(this.Age.equals(ZooAges.Baby)){
-                player.sendMessage(ChatUtils.setColorName("&lYou can't milk a &r&d&lBaby"));
+            if(this.Age.equals(ZooAges.Baby) || this.Age.equals(ZooAges.Young)){
+                player.sendMessage(ChatUtils.setColorName("&lThis Cow is too young to be milked!"));
                 return;
             }
             if(this.Sex.equals(ZooSex.Male)){
