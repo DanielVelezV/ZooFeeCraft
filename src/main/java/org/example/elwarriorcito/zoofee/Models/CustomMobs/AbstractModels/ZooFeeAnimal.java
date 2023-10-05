@@ -80,7 +80,6 @@ public abstract class ZooFeeAnimal implements Listener {
         this.checkOnGrowth();
 
         ZooFee.AllAnimals.add(this);
-        System.out.println();
     }
 
     //region Abstract Methods and Events
@@ -96,7 +95,7 @@ public abstract class ZooFeeAnimal implements Listener {
     public abstract void onDeathEvent(EntityDeathEvent e);
     public void onGrowEvent(AnimalGrowEvent e){
         if(e.getEntity().equals(this.entity)){
-            if(isProductive == false && this.Age.equals(ZooAges.Adult)){
+            if(!isProductive && this.Age.equals(ZooAges.Adult)){
                 isProductive = true;
             }
         }
@@ -133,9 +132,9 @@ public abstract class ZooFeeAnimal implements Listener {
             return;
         }
         Random r = new Random();
-        int i  = r.nextInt(10) + 1;
+        double i  = r.nextDouble();
 
-        if(i < 9){
+        if(i < 0.95){
             return;
         }
 

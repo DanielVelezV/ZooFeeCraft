@@ -22,15 +22,15 @@ public class SpawnZooMobCommand implements CommandExecutor {
         }
 
         Player p = (Player) sender;
-        Random r = new Random();
+
 
         List<String> sexes = Arrays.stream(ZooSex.values())
                 .map(ZooSex::name)
                 .collect(Collectors.toList());
 
-        int a = r.nextInt(sexes.size()) + 1;
+        int r = new Random().nextInt(sexes.size());
 
-        ZooSex sex = ZooSex.valueOf(sexes.get(a - 1));
+        ZooSex sex = ZooSex.valueOf(sexes.get(r));
 
         if(strings.length == 1){
             ZooFeeAnimal animal = ZooFeeAvailableEntityTypes.valueOf(strings[0]).label.get();

@@ -15,7 +15,7 @@ import org.example.elwarriorcito.zoofee.Utils.ZooMobsSerializer;
 import java.util.ArrayList;
 import java.util.List;
 
-public final class ZooFee extends JavaPlugin implements Listener{
+public final class ZooFee extends JavaPlugin{
     public static ZooFee instance = null;
     public static List<ZooFeeAnimal> AllAnimals = new ArrayList<>();
 
@@ -26,9 +26,8 @@ public final class ZooFee extends JavaPlugin implements Listener{
         instance = this;
         this.getCommand("ZooSpawn").setExecutor(new SpawnZooMobCommand());
         this.getCommand("ZooSpawn").setTabCompleter(new SpawnZooMobTabCompleter());
-        this.getServer().getPluginManager().registerEvents(this, this);
 
-        growTaskId = Bukkit.getScheduler().scheduleSyncRepeatingTask(this, this::TryGrow, 0, 20 * 5);
+        growTaskId = Bukkit.getScheduler().scheduleSyncRepeatingTask(this, this::TryGrow, 0, 20 * 60);
 
     }
 
@@ -46,11 +45,6 @@ public final class ZooFee extends JavaPlugin implements Listener{
 
         Bukkit.getScheduler().cancelTask(growTaskId);
 //
-    }
-
-    @EventHandler
-    public void onInteractPlayer(PlayerInteractEntityEvent e){
-        e.getPlayer().sendMessage(e.getRightClicked().getUniqueId().toString());
     }
 
     public static ZooFee getInstance(){

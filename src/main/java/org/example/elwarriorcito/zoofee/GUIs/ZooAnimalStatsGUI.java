@@ -78,9 +78,6 @@ public class ZooAnimalStatsGUI implements Listener {
                                 ChatUtils.setColorName("&r&f&l&oWujuuuuuuuuuuu!"))
                 ), true);
 
-
-
-
         this.Menu.setItem(19, Age);
         this.Menu.setItem(22, Ride);
         this.Menu.setItem(25, SexItem);
@@ -102,10 +99,14 @@ public class ZooAnimalStatsGUI implements Listener {
         if(e.getClickedInventory().equals(this.Menu)){
             e.setCancelled(true);
         }
-        if(e.getCurrentItem().getType() == Material.SADDLE){
-            this.Holder.Ride((Player)e.getWhoClicked());
-            this.CloseMenu((Player)e.getWhoClicked());
-            e.setCancelled(true);
+
+        switch (e.getCurrentItem().getType()) {
+            case SADDLE -> {
+                this.Holder.Ride((Player) e.getWhoClicked());
+                this.CloseMenu((Player) e.getWhoClicked());
+                e.setCancelled(true);
+            }
+
         }
 
 
