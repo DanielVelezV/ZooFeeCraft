@@ -11,6 +11,11 @@ import org.example.elwarriorcito.zoofee.Models.CustomMobs.ZooAnimals.ZooFeePig;
 import org.example.elwarriorcito.zoofee.Models.CustomMobs.Enums.ZooAges;
 import org.example.elwarriorcito.zoofee.Models.CustomMobs.Enums.ZooSex;
 
+import java.util.Arrays;
+import java.util.List;
+import java.util.Random;
+import java.util.stream.Collectors;
+
 public class SpawnZooMobCommand implements CommandExecutor {
     @Override
     public boolean onCommand(CommandSender sender, Command command, String s, String[] strings) {
@@ -19,17 +24,26 @@ public class SpawnZooMobCommand implements CommandExecutor {
         }
 
         Player p = (Player) sender;
+        Random r = new Random();
 
-        if(strings[0].equalsIgnoreCase("cow")){
-            ZooFeeCow cow = new ZooFeeCow(p.getLocation(), ZooAges.Adult, ZooSex.Male);
-        }else if(strings[0].equalsIgnoreCase("pig")){
-            ZooFeePig pig = new ZooFeePig(p.getLocation(), ZooAges.Baby, ZooSex.Female);
-        }else if(strings[0].equalsIgnoreCase("axolotl")) {
-            ZooAxolotl axolotl = new ZooAxolotl(p.getLocation(), ZooAges.Baby, ZooSex.Female);
-        }else if(strings[0].equalsIgnoreCase("bunny")) {
-            ZooBunny axolotl = new ZooBunny(p.getLocation(), ZooAges.Baby, ZooSex.Female);
+        List<String> sexes = Arrays.stream(ZooSex.values())
+                .map(ZooSex::name)
+                .collect(Collectors.toList());
+
+        int a = r.nextInt(sexes.size()) + 1;
+
+        ZooSex sex = ZooSex.valueOf(sexes.get(a - 1));
+
+        if(strings[0].equalsIgnoreCase("COW")){
+            ZooFeeCow cow = new ZooFeeCow(p.getLocation(), ZooAges.Baby, sex);
+        }else if(strings[0].equalsIgnoreCase("PIG")){
+            ZooFeePig pig = new ZooFeePig(p.getLocation(), ZooAges.Baby, sex);
+        }else if(strings[0].equalsIgnoreCase("AXOLOTL")) {
+            ZooAxolotl axolotl = new ZooAxolotl(p.getLocation(), ZooAges.Baby, sex);
+        }else if(strings[0].equalsIgnoreCase("BUNNY")) {
+            ZooBunny axolotl = new ZooBunny(p.getLocation(), ZooAges.Baby, sex);
         }else{
-            ZooFeePig pig = new ZooFeePig(p.getLocation(), ZooAges.Baby, ZooSex.Female);
+            ZooFeePig pig = new ZooFeePig(p.getLocation(), ZooAges.Baby, sex);
         }
 
         return true;
