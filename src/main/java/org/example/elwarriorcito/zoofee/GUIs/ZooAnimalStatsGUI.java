@@ -15,6 +15,7 @@ import org.example.elwarriorcito.zoofee.Models.CustomMobs.AbstractModels.ZooFeeA
 import org.example.elwarriorcito.zoofee.Models.CustomMobs.Enums.ZooSex;
 import org.example.elwarriorcito.zoofee.Models.CustomMobs.AbstractModels.ZooFeeAnimalMilkable;
 import org.example.elwarriorcito.zoofee.Utils.ChatUtils;
+import org.example.elwarriorcito.zoofee.Utils.ItemManager;
 import org.example.elwarriorcito.zoofee.ZooFee;
 
 import java.util.ArrayList;
@@ -37,63 +38,52 @@ public class ZooAnimalStatsGUI implements Listener {
 
         if(this.Holder instanceof ZooFeeAnimalMilkable && this.Holder.Sex.equals(ZooSex.Female)){
             ZooFeeAnimalMilkable animal = (ZooFeeAnimalMilkable) this.Holder;
-            ItemStack MilkQuality = new ItemStack(Material.MILK_BUCKET, 1);
-            ItemMeta MilkLore = MilkQuality.getItemMeta();
-            MilkLore.addItemFlags(ItemFlag.HIDE_ENCHANTS);
-            MilkLore.addEnchant(Enchantment.ARROW_INFINITE, 3, true);
-            MilkLore.setDisplayName(ChatUtils.setColorName("&r&f&lMilk Quality: &r&6&l" + animal.MilkQuality.label));
-            List<String> MilkLoreDescription = new ArrayList<>(
-                    Arrays.asList(
-                            ChatUtils.setColorName("&r"),
-                            ChatUtils.setColorName("&r&f&lNext Quality: &r&6&lVery good"))
-            );
-
-            MilkLore.setLore(MilkLoreDescription);
-            MilkQuality.setItemMeta(MilkLore);
+            ItemStack MilkQuality = ItemManager.BuildItem("&r&f&lMilk Quality: &r&6&l" + animal.MilkQuality.label,
+                    Material.MILK_BUCKET,
+                    1,
+                    new ArrayList<>(
+                            Arrays.asList(
+                                    ChatUtils.setColorName("&r"),
+                                    ChatUtils.setColorName("&r&f&lNext Quality: &r&6&lVery good"))
+                    ),
+                    true);
 
             this.Menu.setItem(13, MilkQuality);
         }
         // Age
-        ItemStack Age = new ItemStack(Material.CLOCK, 1);
-        ItemMeta Lore = Age.getItemMeta();
-        Lore.setDisplayName(ChatUtils.setColorName("&r&f&lAge: &r&6&l" + this.Holder.Age.label));
-        List<String> LoreDescription = new ArrayList<>(
-                Arrays.asList(
-                        ChatUtils.setColorName("&r"),
-                        ChatUtils.setColorName("&r&f&lTime left: &r&l" + "45~ days"))
-                        );
+        ItemStack Age = ItemManager.BuildItem("&r&f&lAge: &r&6&l" + this.Holder.Age.label,
+                Material.CLOCK,
+                1,
+                new ArrayList<>(
+                        Arrays.asList(
+                                ChatUtils.setColorName("&r"),
+                                ChatUtils.setColorName("&r&f&lTime left: &r&l" + "45~ days"))
+                ),
+                true);
 
-        Lore.setLore(LoreDescription);
-        Age.setItemMeta(Lore);
 
         // Sex
-        ItemStack Sex = this.Holder.Sex.equals(ZooSex.Male) ? new ItemStack(Material.STICK) : new ItemStack(Material.DRIED_KELP);
+        Material Sex = this.Holder.Sex.equals(ZooSex.Male) ? Material.STICK : Material.DRIED_KELP;
         String SexString = this.Holder.Sex.equals(ZooSex.Male) ? "&9&lMale ♂" : "&d&lFemale ♀";
-        ItemMeta SexLore = Sex.getItemMeta();
-        SexLore.setDisplayName(ChatUtils.setColorName("&r&f&lSex: " + SexString));
+        ItemStack SexItem = ItemManager.BuildItem("&r&f&lSex: " + SexString, Sex, 1, null, null);
 
-        Sex.setItemMeta(SexLore);
 
         // Ride Animal
-        ItemStack Ride = new ItemStack(Material.SADDLE);
-        ItemMeta RideLore = Ride.getItemMeta();
-        RideLore.setDisplayName(ChatUtils.setColorName("&r&6&lRide"));
+        ItemStack Ride = ItemManager.BuildItem("&r&6&lRide",
+                Material.SADDLE,
+                1,
+                new ArrayList<>(
+                        Arrays.asList(
+                                ChatUtils.setColorName("&r"),
+                                ChatUtils.setColorName("&r&f&l&oWujuuuuuuuuuuu!"))
+                ), true);
 
-        List<String> RideLoreDescription = new ArrayList<>(
-                Arrays.asList(
-                        ChatUtils.setColorName("&r"),
-                        ChatUtils.setColorName("&r&f&l&oWujuuuuuuuuuuu!"))
-        );
-
-        RideLore.setLore(RideLoreDescription);
-
-        Ride.setItemMeta(RideLore);
 
 
 
         this.Menu.setItem(19, Age);
         this.Menu.setItem(22, Ride);
-        this.Menu.setItem(25, Sex);
+        this.Menu.setItem(25, SexItem);
 
 
     }
@@ -109,15 +99,16 @@ public class ZooAnimalStatsGUI implements Listener {
 
     @EventHandler
     public void onInventoryInteract(InventoryClickEvent e){
+        if(e.getClickedInventory().equals(this.Menu)){
+            e.setCancelled(true);
+        }
         if(e.getCurrentItem().getType() == Material.SADDLE){
             this.Holder.Ride((Player)e.getWhoClicked());
             this.CloseMenu((Player)e.getWhoClicked());
             e.setCancelled(true);
         }
 
-        if(e.getClickedInventory().equals(this.Menu)){
-            e.setCancelled(true);
-        }
+
 
 
     }
