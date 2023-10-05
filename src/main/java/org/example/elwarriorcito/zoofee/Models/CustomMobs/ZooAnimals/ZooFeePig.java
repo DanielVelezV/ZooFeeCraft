@@ -11,6 +11,7 @@ import org.bukkit.inventory.EquipmentSlot;
 import org.example.elwarriorcito.zoofee.Models.CustomMobs.AbstractModels.ZooFeeAnimal;
 import org.example.elwarriorcito.zoofee.Models.CustomMobs.Enums.ZooAges;
 import org.example.elwarriorcito.zoofee.Models.CustomMobs.Enums.ZooSex;
+import org.example.elwarriorcito.zoofee.Models.CustomMobs.Events.AnimalGrowEvent;
 import org.example.elwarriorcito.zoofee.Utils.ChatUtils;
 
 
@@ -47,6 +48,13 @@ public class ZooFeePig extends ZooFeeAnimal implements Listener {
     public void onDeathEvent(EntityDeathEvent e){
         if(e.getEntity().equals(this.entity)){
             this.HolographicName.removeAll();
+        }
+    }
+
+    @Override
+    public void onGrowEvent(AnimalGrowEvent e) {
+        if(e.getEntity().equals(this.entity)){
+            this.HolographicName.AddLine(ChatUtils.setColorName("&a&l!"));
         }
     }
 

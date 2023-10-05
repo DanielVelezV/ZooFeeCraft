@@ -6,13 +6,14 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.example.elwarriorcito.zoofee.Commands.SpawnZooMobCommand;
+import org.example.elwarriorcito.zoofee.Commands.SpawnZooMobTabCompleter;
 import org.example.elwarriorcito.zoofee.Models.CustomMobs.AbstractModels.ZooFeeAnimal;
 import org.example.elwarriorcito.zoofee.Utils.ZooMobsSerializer;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public final class ZooFee extends JavaPlugin implements Listener {
+public final class ZooFee extends JavaPlugin {
     public static ZooFee instance = null;
     public static List<ZooFeeAnimal> AllAnimals = new ArrayList<>();
 
@@ -20,15 +21,11 @@ public final class ZooFee extends JavaPlugin implements Listener {
     public void onEnable(){
         instance = this;
         this.getCommand("ZooSpawn").setExecutor(new SpawnZooMobCommand());
-        this.getServer().getPluginManager().registerEvents(this, this);
+        this.getCommand("ZooSpawn").setTabCompleter(new SpawnZooMobTabCompleter());
 
 
     }
 
-    @EventHandler
-    public void onPlayerInteract(PlayerInteractEntityEvent e){
-        System.out.println(e.getRightClicked().getUniqueId());
-    }
     @Override
     public void onDisable() {
         Gson gson = new Gson();

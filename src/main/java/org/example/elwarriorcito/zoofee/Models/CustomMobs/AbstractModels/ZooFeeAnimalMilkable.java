@@ -7,12 +7,18 @@ import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.entity.EntityDeathEvent;
+import org.bukkit.event.player.PlayerBucketFillEvent;
+import org.bukkit.event.player.PlayerInteractEntityEvent;
+import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.example.elwarriorcito.zoofee.Models.CustomMobs.Enums.ZooAges;
 import org.example.elwarriorcito.zoofee.Models.CustomMobs.Enums.ZooMilkQuality;
 import org.example.elwarriorcito.zoofee.Models.CustomMobs.Enums.ZooSex;
+import org.example.elwarriorcito.zoofee.Models.CustomMobs.Events.AnimalGrowEvent;
 import org.example.elwarriorcito.zoofee.Utils.ChatUtils;
 import org.example.elwarriorcito.zoofee.ZooFee;
 
@@ -32,37 +38,9 @@ public abstract class ZooFeeAnimalMilkable extends ZooFeeAnimal{
     public ZooFeeAnimalMilkable(EntityType type, Location location, String Name, ZooSex Sex, ZooAges Age) {
         super(type, location, Name, Sex, Age);
 
-        this.HolographicName.AddLine(ChatUtils.setColorName("&a&l!"));
         this.MilkQuality = ZooMilkQuality.Very_Good;
     }
 
-    public void onPlayerMilkEvent(Player player, Entity MilkedEntity){
-        if(this.entity.equals(MilkedEntity)){
-            if(this.Sex.equals(ZooSex.Male)){
-                player.sendMessage(ChatUtils.setColorName("&lYou can't milk a &r&9&lMale"));
-                return;
-            }
-            if(this.Age.equals(ZooAges.Baby)){
-                player.sendMessage(ChatUtils.setColorName("&lYou can't milk a &r&d&lBaby"));
-                return;
-            }
-            if(this.CurrentMilkingCoolDown > 0){
-                player.sendMessage("The Cow: " + this.Name + " has been milked already. Cooldown now is: " + this.CurrentMilkingCoolDown);
-
-            }else if(this.CurrentMilkingCoolDown == 0){
-                this.HolographicName.EditLine(2, ChatUtils.setColorName("&r "));
-                player.sendMessage("You just milked " + this.Name + ". Cooldown now is: " + this.MilkingCooldown);
-                this.CurrentMilkingCoolDown = this.MilkingCooldown;
-                ItemStack item = this.giveMilkBasedOnQuality();
-                player.getInventory().addItem(item);
-                this.taskID = Bukkit.getScheduler().scheduleSyncRepeatingTask(ZooFee.getInstance(),
-                        this::LowerCooldown,
-                        0,
-                        20);
-            }
-
-        }
-    }
     private void LowerCooldown(){
         if(this.CurrentMilkingCoolDown > 0){
             this.CurrentMilkingCoolDown -= 1;
@@ -120,5 +98,66 @@ public abstract class ZooFeeAnimalMilkable extends ZooFeeAnimal{
         }
     }
 
+    //region Event Handlers
+    public void onPlayerMilkEvent(Player player, Entity MilkedEntity){
+        if(this.entity.equals(MilkedEntity)){
+            if(this.Age.equals(ZooAges.Baby)){
+                player.sendMessage(ChatUtils.setColorName("&lYou can't milk a &r&d&lBaby"));
+                return;
+            }
+            if(this.Sex.equals(ZooSex.Male)){
+                player.sendMessage(ChatUtils.setColorName("&lYou can't milk a &r&9&lMale"));
+                return;
+            }
+            if(this.CurrentMilkingCoolDown > 0){
+                player.sendMessage("The Cow: " + this.Name + " has been milked already. Cooldown now is: " + this.CurrentMilkingCoolDown);
+
+            }else if(this.CurrentMilkingCoolDown == 0){
+                this.HolographicName.EditLine(2, ChatUtils.setColorName("&r "));
+                player.sendMessage("You just milked " + this.Name + ". Cooldown now is: " + this.MilkingCooldown);
+                this.CurrentMilkingCoolDown = this.MilkingCooldown;
+                ItemStack item = this.giveMilkBasedOnQuality();
+                player.getInventory().addItem(item);
+                this.taskID = Bukkit.getScheduler().scheduleSyncRepeatingTask(ZooFee.getInstance(),
+                        this::LowerCooldown,
+                        0,
+                        20);
+            }
+
+        }
+    }
+    @EventHandler
+    public void onGrowEvent(AnimalGrowEvent e) {
+        if(e.getEntity().equals(this.entity) && this.Sex.equals(ZooSex.Female)){
+            this.HolographicName.AddLine(ChatUtils.setColorName("&a&l!"));
+        }
+    }
+    @EventHandler
+    public void onDeathEvent(EntityDeathEvent e) {
+        if(e.getEntity().equals(this.entity)){
+            this.HolographicName.removeAll();
+            e.getDrops().clear();
+        }
+    }
+    @EventHandler
+    public void onInteractEvent(PlayerInteractEntityEvent e) {
+        if(e.getPlayer().getItemInHand().getType().equals(Material.BUCKET) && e.getHand().equals(EquipmentSlot.HAND)){
+            this.onPlayerMilkEvent(e.getPlayer(), e.getRightClicked());
+            return;
+        }
+        if(e.getRightClicked() == this.entity && e.getHand().equals(EquipmentSlot.HAND)){
+            this.Menu.ShowInventory(e.getPlayer());
+            System.out.println(e.getRightClicked().getUniqueId());
+        }
+    }
+    @EventHandler
+    public void onPlayerBucketFill(PlayerBucketFillEvent e) {
+        if (e.getItemStack().getType() == Material.MILK_BUCKET)
+        {
+            e.setItemStack(new ItemStack(Material.BUCKET));
+            e.getPlayer().updateInventory();
+        }
+    }
+    //endregion
 
 }

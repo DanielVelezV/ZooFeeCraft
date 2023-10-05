@@ -15,6 +15,7 @@ import org.bukkit.inventory.ItemStack;
 import org.example.elwarriorcito.zoofee.Models.CustomMobs.Enums.ZooAges;
 import org.example.elwarriorcito.zoofee.Models.CustomMobs.Enums.ZooSex;
 import org.example.elwarriorcito.zoofee.Models.CustomMobs.AbstractModels.ZooFeeAnimalMilkable;
+import org.example.elwarriorcito.zoofee.Models.CustomMobs.Events.AnimalGrowEvent;
 import org.example.elwarriorcito.zoofee.Utils.ChatUtils;
 
 
@@ -31,35 +32,13 @@ public class ZooFeeCow extends ZooFeeAnimalMilkable {
 
 
 
-    @EventHandler
-    public void onInteractEvent(PlayerInteractEntityEvent e) {
-        if(e.getPlayer().getItemInHand().getType().equals(Material.BUCKET) && e.getHand().equals(EquipmentSlot.HAND)){
-            this.onPlayerMilkEvent(e.getPlayer(), e.getRightClicked());
-            return;
-        }
-        if(e.getRightClicked() == this.entity && e.getHand().equals(EquipmentSlot.HAND)){
-            this.Menu.ShowInventory(e.getPlayer());
-            System.out.println(e.getRightClicked().getUniqueId());
-        }
-    }
 
-    @EventHandler
-    public void onPlayerBucketFill(PlayerBucketFillEvent e)
-    {
-        if (e.getItemStack().getType() == Material.MILK_BUCKET)
-        {
-            e.setItemStack(new ItemStack(Material.BUCKET));
-            e.getPlayer().updateInventory();
-        }
-    }
 
-    @EventHandler
-    public void onDeathEvent(EntityDeathEvent e) {
-        if(e.getEntity().equals(this.entity)){
-            this.HolographicName.removeAll();
-            e.getDrops().clear();
-        }
-    }
+
+
+
+
+
 
 
 }

@@ -9,6 +9,7 @@ import org.bukkit.inventory.EquipmentSlot;
 import org.example.elwarriorcito.zoofee.Models.CustomMobs.AbstractModels.ZooFeeAnimal;
 import org.example.elwarriorcito.zoofee.Models.CustomMobs.Enums.ZooAges;
 import org.example.elwarriorcito.zoofee.Models.CustomMobs.Enums.ZooSex;
+import org.example.elwarriorcito.zoofee.Models.CustomMobs.Events.AnimalGrowEvent;
 import org.example.elwarriorcito.zoofee.Utils.ChatUtils;
 
 public class ZooAxolotl extends ZooFeeAnimal {
@@ -32,5 +33,12 @@ public class ZooAxolotl extends ZooFeeAnimal {
     @EventHandler
     public void onDeathEvent(EntityDeathEvent e) {
 
+    }
+
+    @Override
+    public void onGrowEvent(AnimalGrowEvent e) {
+        if(e.getEntity().equals(this.entity)){
+            this.HolographicName.AddLine(ChatUtils.setColorName("&a&l!"));
+        }
     }
 }
