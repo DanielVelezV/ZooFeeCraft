@@ -1,6 +1,8 @@
 package org.example.elwarriorcito.zoofee;
 
 import com.google.gson.Gson;
+import com.mojang.datafixers.TypeRewriteRule;
+import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
@@ -13,16 +15,20 @@ import org.example.elwarriorcito.zoofee.Utils.ZooMobsSerializer;
 import java.util.ArrayList;
 import java.util.List;
 
-public final class ZooFee extends JavaPlugin {
+public final class ZooFee extends JavaPlugin implements Listener{
     public static ZooFee instance = null;
     public static List<ZooFeeAnimal> AllAnimals = new ArrayList<>();
+
+    private int growTaskId;
 
     @Override
     public void onEnable(){
         instance = this;
         this.getCommand("ZooSpawn").setExecutor(new SpawnZooMobCommand());
         this.getCommand("ZooSpawn").setTabCompleter(new SpawnZooMobTabCompleter());
+        this.getServer().getPluginManager().registerEvents(this, this);
 
+        growTaskId = Bukkit.getScheduler().scheduleSyncRepeatingTask(this, this::TryGrow, 0, 20 * 5);
 
     }
 
@@ -37,11 +43,24 @@ public final class ZooFee extends JavaPlugin {
         String serielized = gson.toJson(a);
 
         System.out.println(serielized);
+
+        Bukkit.getScheduler().cancelTask(growTaskId);
 //
+    }
+
+    @EventHandler
+    public void onInteractPlayer(PlayerInteractEntityEvent e){
+        e.getPlayer().sendMessage(e.getRightClicked().getUniqueId().toString());
     }
 
     public static ZooFee getInstance(){
         return instance;
+    }
+
+    public void TryGrow(){
+        for (ZooFeeAnimal a : AllAnimals){
+            a.checkOnGrowth();
+        }
     }
 
 }

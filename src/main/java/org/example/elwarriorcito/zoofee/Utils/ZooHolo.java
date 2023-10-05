@@ -20,7 +20,6 @@ public class ZooHolo implements Listener {
 
     public LivingEntity holder;
 
-    public ArmorStand line;
 
     private List<ArmorStand> lines = new ArrayList<>();
 
@@ -72,7 +71,9 @@ public class ZooHolo implements Listener {
             i.remove();
         }
     }
-
+    public int getLines() {
+        return lines.size();
+    }
 
     //region Events
     @EventHandler

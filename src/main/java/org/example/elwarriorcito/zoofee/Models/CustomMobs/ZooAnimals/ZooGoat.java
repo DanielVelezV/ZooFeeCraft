@@ -8,10 +8,9 @@ import org.example.elwarriorcito.zoofee.Models.CustomMobs.Enums.ZooSex;
 import org.example.elwarriorcito.zoofee.Utils.ChatUtils;
 
 public class ZooGoat extends ZooFeeAnimalMilkable {
-    public ZooGoat(EntityType type, Location location, ZooSex Sex, ZooAges Age) {
-        super(type,
-                location,
-                ChatUtils.setColorName(""),
+    public ZooGoat(ZooAges Age, ZooSex Sex) {
+        super(EntityType.GOAT,
+                ChatUtils.setColorName("&7&lZoo&r&f&lGoat"),
                 Sex,
                 Age);
     }

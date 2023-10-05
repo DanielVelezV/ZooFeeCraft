@@ -4,11 +4,9 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.example.elwarriorcito.zoofee.Models.CustomMobs.ZooAnimals.ZooAxolotl;
-import org.example.elwarriorcito.zoofee.Models.CustomMobs.ZooAnimals.ZooBunny;
-import org.example.elwarriorcito.zoofee.Models.CustomMobs.ZooAnimals.ZooFeeCow;
-import org.example.elwarriorcito.zoofee.Models.CustomMobs.ZooAnimals.ZooFeePig;
-import org.example.elwarriorcito.zoofee.Models.CustomMobs.Enums.ZooAges;
+import org.example.elwarriorcito.zoofee.Models.CustomMobs.AbstractModels.ZooFeeAnimal;
+import org.example.elwarriorcito.zoofee.Models.CustomMobs.AbstractModels.ZooFeeAnimalMilkable;
+import org.example.elwarriorcito.zoofee.Models.CustomMobs.Enums.ZooFeeAvailableEntityTypes;
 import org.example.elwarriorcito.zoofee.Models.CustomMobs.Enums.ZooSex;
 
 import java.util.Arrays;
@@ -34,16 +32,10 @@ public class SpawnZooMobCommand implements CommandExecutor {
 
         ZooSex sex = ZooSex.valueOf(sexes.get(a - 1));
 
-        if(strings[0].equalsIgnoreCase("COW")){
-            ZooFeeCow cow = new ZooFeeCow(p.getLocation(), ZooAges.Baby, sex);
-        }else if(strings[0].equalsIgnoreCase("PIG")){
-            ZooFeePig pig = new ZooFeePig(p.getLocation(), ZooAges.Baby, sex);
-        }else if(strings[0].equalsIgnoreCase("AXOLOTL")) {
-            ZooAxolotl axolotl = new ZooAxolotl(p.getLocation(), ZooAges.Baby, sex);
-        }else if(strings[0].equalsIgnoreCase("BUNNY")) {
-            ZooBunny axolotl = new ZooBunny(p.getLocation(), ZooAges.Baby, sex);
-        }else{
-            ZooFeePig pig = new ZooFeePig(p.getLocation(), ZooAges.Baby, sex);
+        if(strings.length == 1){
+            ZooFeeAnimal animal = ZooFeeAvailableEntityTypes.valueOf(strings[0]).label.get();
+            animal.Spawn(p.getLocation());
+            animal.setSex(sex);
         }
 
         return true;

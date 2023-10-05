@@ -35,8 +35,8 @@ public abstract class ZooFeeAnimalMilkable extends ZooFeeAnimal{
     public ZooMilkQuality MilkQuality;
     private int taskID;
 
-    public ZooFeeAnimalMilkable(EntityType type, Location location, String Name, ZooSex Sex, ZooAges Age) {
-        super(type, location, Name, Sex, Age);
+    public ZooFeeAnimalMilkable(EntityType type, String Name, ZooSex Sex, ZooAges Age) {
+        super(type, Name, Sex, Age);
 
         this.MilkQuality = ZooMilkQuality.Very_Good;
     }
@@ -128,8 +128,14 @@ public abstract class ZooFeeAnimalMilkable extends ZooFeeAnimal{
     }
     @EventHandler
     public void onGrowEvent(AnimalGrowEvent e) {
-        if(e.getEntity().equals(this.entity) && this.Sex.equals(ZooSex.Female)){
-            this.HolographicName.AddLine(ChatUtils.setColorName("&a&l!"));
+        super.onGrowEvent(e);
+
+        if(this.isProductive){
+            if(this.Sex.equals(ZooSex.Female)){
+                if(this.HolographicName.getLines() <= 2){
+                    this.HolographicName.AddLine(ChatUtils.setColorName("&a&l!"));
+                }
+            }
         }
     }
     @EventHandler
@@ -145,10 +151,9 @@ public abstract class ZooFeeAnimalMilkable extends ZooFeeAnimal{
             this.onPlayerMilkEvent(e.getPlayer(), e.getRightClicked());
             return;
         }
-        if(e.getRightClicked() == this.entity && e.getHand().equals(EquipmentSlot.HAND)){
-            this.Menu.ShowInventory(e.getPlayer());
-            System.out.println(e.getRightClicked().getUniqueId());
-        }
+
+
+        super.onInteractEvent(e);
     }
     @EventHandler
     public void onPlayerBucketFill(PlayerBucketFillEvent e) {

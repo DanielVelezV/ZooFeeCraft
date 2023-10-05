@@ -1,5 +1,4 @@
 package org.example.elwarriorcito.zoofee.Models.CustomMobs.ZooAnimals;
-import org.bukkit.Location;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Pig;
 import org.bukkit.event.EventHandler;
@@ -15,11 +14,10 @@ import org.example.elwarriorcito.zoofee.Models.CustomMobs.Events.AnimalGrowEvent
 import org.example.elwarriorcito.zoofee.Utils.ChatUtils;
 
 
-public class ZooFeePig extends ZooFeeAnimal implements Listener {
+public class ZooPig extends ZooFeeAnimal implements Listener {
     private Pig pig;
-    public ZooFeePig(Location location, ZooAges age, ZooSex sex) {
+    public ZooPig(ZooAges age, ZooSex sex) {
         super(EntityType.PIG,
-                location,
                 ChatUtils.setColorName("&d&lZooPiggy"),
                 sex,
                 age);
@@ -32,9 +30,7 @@ public class ZooFeePig extends ZooFeeAnimal implements Listener {
     //region Events
     @EventHandler
     public void onInteractEvent(PlayerInteractEntityEvent e){
-        if(e.getRightClicked() == this.pig && e.getHand().equals(EquipmentSlot.HAND)){
-            this.Menu.ShowInventory(e.getPlayer());
-        }
+        super.onInteractEvent(e);
     }
 
     @EventHandler
@@ -51,11 +47,9 @@ public class ZooFeePig extends ZooFeeAnimal implements Listener {
         }
     }
 
-    @Override
+    @EventHandler
     public void onGrowEvent(AnimalGrowEvent e) {
-        if(e.getEntity().equals(this.entity)){
-            this.HolographicName.AddLine(ChatUtils.setColorName("&a&l!"));
-        }
+        super.onGrowEvent(e);
     }
 
 

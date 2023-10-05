@@ -13,9 +13,8 @@ import org.example.elwarriorcito.zoofee.Models.CustomMobs.Events.AnimalGrowEvent
 import org.example.elwarriorcito.zoofee.Utils.ChatUtils;
 
 public class ZooBunny extends ZooFeeAnimal {
-    public ZooBunny(Location location, ZooAges Age, ZooSex Sex) {
+    public ZooBunny(ZooAges Age, ZooSex Sex) {
         super(EntityType.RABBIT,
-                location,
                 ChatUtils.setColorName("&6&lZoo" + "&7&lBunny"),
                 Sex,
                 Age);
@@ -23,9 +22,7 @@ public class ZooBunny extends ZooFeeAnimal {
 
     @EventHandler
     public void onInteractEvent(PlayerInteractEntityEvent e) {
-        if(e.getRightClicked() == this.entity && e.getHand().equals(EquipmentSlot.HAND)){
-            this.Menu.ShowInventory(e.getPlayer());
-        }
+        super.onInteractEvent(e);
     }
 
     @EventHandler
@@ -35,10 +32,8 @@ public class ZooBunny extends ZooFeeAnimal {
         }
     }
 
-    @Override
+    @EventHandler
     public void onGrowEvent(AnimalGrowEvent e) {
-        if(e.getEntity().equals(this.entity)){
-            this.HolographicName.AddLine(ChatUtils.setColorName("&a&l!"));
-        }
+        super.onGrowEvent(e);
     }
 }

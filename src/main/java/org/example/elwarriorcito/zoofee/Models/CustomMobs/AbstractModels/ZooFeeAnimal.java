@@ -7,6 +7,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
+import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.example.elwarriorcito.zoofee.Models.CustomMobs.Enums.ZooAges;
 import org.example.elwarriorcito.zoofee.Models.CustomMobs.Enums.ZooSex;
@@ -16,6 +17,8 @@ import org.example.elwarriorcito.zoofee.Utils.ChatUtils;
 import org.example.elwarriorcito.zoofee.Utils.ZooHolo;
 import org.example.elwarriorcito.zoofee.Utils.ZooMobsSerializer;
 import org.example.elwarriorcito.zoofee.ZooFee;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -37,46 +40,67 @@ public abstract class ZooFeeAnimal implements Listener {
     public int MaxHealth, MaxHunger, MaxThirst, MaxStress;
     protected ZooHolo HolographicName;
     protected ZooAnimalStatsGUI Menu;
+
     protected Animals entity;
+
+
+
+    protected boolean isProductive = false;
+
     public ZooFeeAnimal(EntityType type,
-                        Location location,
                         String Name,
                         ZooSex Sex,
                         ZooAges Age){
-
         ZooFee.getInstance().getServer().getPluginManager().registerEvents(this, ZooFee.getInstance());
-
         this.Sex = Sex;
         this.Age = Age;
         this.Name = Name;
         this.type = type;
-        this.entity = (Animals) location.getWorld().spawnEntity(location, this.type);
+
 
         Health      = Hunger = Thirst = Stress = 20;
         MaxHealth   = MaxHunger = MaxThirst = MaxStress = 20;
 
-        if(this.Age.equals(ZooAges.Baby)){
-            this.entity.setBaby();
-        }
 
+    }
 
-        this.entity.setPersistent(true);
-        this.entity.setAgeLock(true);
-
+    public void Spawn(Location location){
+        this.entity = (Animals) location.getWorld().spawnEntity(location, this.type);
         this.Menu = new ZooAnimalStatsGUI(this);
         this.HolographicName = new ZooHolo((LivingEntity) this.entity);
         this.ShowName();
 
-        ZooFee.AllAnimals.add(this);
+        if(this.Age.equals(ZooAges.Baby)){
+            this.entity.setBaby();
+        }
+        this.entity.setPersistent(true);
+        this.entity.setAgeLock(true);
 
         this.CalculateStats();
         this.checkOnGrowth();
+
+        ZooFee.AllAnimals.add(this);
+        System.out.println();
     }
 
     //region Abstract Methods and Events
-    public abstract void onInteractEvent(PlayerInteractEntityEvent e);
+    /**
+    super: Open Inventory
+     */
+    @EventHandler
+    public void onInteractEvent(PlayerInteractEntityEvent e){
+        if(e.getRightClicked() == this.entity && e.getHand().equals(EquipmentSlot.HAND)){
+            this.Menu.ShowInventory(e.getPlayer());
+        }
+    }
     public abstract void onDeathEvent(EntityDeathEvent e);
-    public abstract void onGrowEvent(AnimalGrowEvent e);
+    public void onGrowEvent(AnimalGrowEvent e){
+        if(e.getEntity().equals(this.entity)){
+            if(isProductive == false && this.Age.equals(ZooAges.Adult)){
+                isProductive = true;
+            }
+        }
+    }
     public void CalculateStats(){
         List<Integer> MaxAttributes = new ArrayList<>();
         MaxAttributes.add(this.MaxHealth);
