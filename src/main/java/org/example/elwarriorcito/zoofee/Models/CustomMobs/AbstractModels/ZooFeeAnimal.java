@@ -6,33 +6,30 @@ import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDeathEvent;
+import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryCloseEvent;
+import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.inventory.EquipmentSlot;
-import org.bukkit.inventory.ItemStack;
+import org.example.elwarriorcito.zoofee.GUIs.GUIManager;
 import org.example.elwarriorcito.zoofee.Models.CustomMobs.Enums.ZooAges;
 import org.example.elwarriorcito.zoofee.Models.CustomMobs.Enums.ZooSex;
 import org.example.elwarriorcito.zoofee.GUIs.ZooAnimalStatsGUI;
 import org.example.elwarriorcito.zoofee.Models.CustomMobs.Events.AnimalGrowEvent;
+import org.example.elwarriorcito.zoofee.Models.CustomMobs.Interfaces.InventoryHandler;
 import org.example.elwarriorcito.zoofee.Utils.ChatUtils;
 import org.example.elwarriorcito.zoofee.Utils.ZooHolo;
 import org.example.elwarriorcito.zoofee.Utils.ZooMobsSerializer;
 import org.example.elwarriorcito.zoofee.ZooFee;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
-import java.util.stream.Collectors;
 
 
-public abstract class ZooFeeAnimal implements Listener {
+public abstract class ZooFeeAnimal implements InventoryHandler, Listener {
 
     protected EntityType type;
-
-
-
     public String Name;
     public ZooAges Age;
     public ZooSex Sex;
@@ -42,6 +39,7 @@ public abstract class ZooFeeAnimal implements Listener {
     protected ZooAnimalStatsGUI Menu;
 
     protected Animals entity;
+    protected GUIManager menuManager;
 
 
 
@@ -57,16 +55,17 @@ public abstract class ZooFeeAnimal implements Listener {
         this.Name = Name;
         this.type = type;
 
-
         Health      = Hunger = Thirst = Stress = 20;
         MaxHealth   = MaxHunger = MaxThirst = MaxStress = 20;
+
+
 
 
     }
 
     public void Spawn(Location location){
         this.entity = (Animals) location.getWorld().spawnEntity(location, this.type);
-        this.Menu = new ZooAnimalStatsGUI(this);
+
         this.HolographicName = new ZooHolo((LivingEntity) this.entity);
         this.ShowName();
 
@@ -79,6 +78,7 @@ public abstract class ZooFeeAnimal implements Listener {
         this.CalculateStats();
         this.checkOnGrowth();
 
+        this.Menu = new ZooAnimalStatsGUI(this);
         ZooFee.AllAnimals.add(this);
     }
 
@@ -89,7 +89,7 @@ public abstract class ZooFeeAnimal implements Listener {
     @EventHandler
     public void onInteractEvent(PlayerInteractEntityEvent e){
         if(e.getRightClicked() == this.entity && e.getHand().equals(EquipmentSlot.HAND)){
-            this.Menu.ShowInventory(e.getPlayer());
+            this.Menu.OpenMenu(e.getPlayer());
         }
     }
     public abstract void onDeathEvent(EntityDeathEvent e);
@@ -120,37 +120,26 @@ public abstract class ZooFeeAnimal implements Listener {
 
         this.Stress = Math.abs((int) StatsPercentaje - 100);
 
-
-
-        System.out.println(this.Stress);
-
-
-
     }
     public void checkOnGrowth(){
         if(this.Age.equals(ZooAges.Old)){
             return;
         }
         Random r = new Random();
-        double i  = r.nextDouble();
 
-        if(i < 0.95){
+        if(r.nextDouble() < 0.5){
             return;
         }
 
-        List<String> ages = Arrays.stream(ZooAges.values())
-                .map(ZooAges::name)
-                .collect(Collectors.toList());
+        ZooAges nextAge = ZooAges.values()[this.Age.ordinal() + 1];
 
-        for (int j = 0; j < ages.size(); j++) {
-            if(ages.get(j).equals(this.Age.name())){
-                this.setAge(ZooAges.valueOf(ages.get(j + 1)));
-                if(!(this.Age.equals(ZooAges.Baby))){
-                    this.entity.setAdult();
-                    AnimalGrowEvent e = new AnimalGrowEvent(this.entity, this.Age);
-                    Bukkit.getPluginManager().callEvent(e);
-                }
-                return;
+        if(nextAge != null){
+            this.setAge(nextAge);
+
+            if(!(this.Age.equals(ZooAges.Baby))){
+                this.entity.setAdult();
+                AnimalGrowEvent e = new AnimalGrowEvent(this.entity, this.Age);
+                Bukkit.getPluginManager().callEvent(e);
             }
         }
     }
@@ -203,6 +192,21 @@ public abstract class ZooFeeAnimal implements Listener {
         );
     }
     //endregion
+
+    @Override
+    public void onClick(InventoryClickEvent e){
+
+    }
+
+    @Override
+    public void onOpen(InventoryOpenEvent e){
+
+    }
+
+    @Override
+    public void onClose(InventoryCloseEvent e){
+
+    }
 }
 
 

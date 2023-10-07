@@ -1,12 +1,16 @@
 package org.example.elwarriorcito.zoofee.GUIs;
 
 import org.bukkit.Bukkit;
+import org.bukkit.EntityEffect;
 import org.bukkit.Material;
+import org.bukkit.Sound;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryCloseEvent;
+import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
@@ -14,6 +18,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.example.elwarriorcito.zoofee.Models.CustomMobs.AbstractModels.ZooFeeAnimal;
 import org.example.elwarriorcito.zoofee.Models.CustomMobs.Enums.ZooSex;
 import org.example.elwarriorcito.zoofee.Models.CustomMobs.AbstractModels.ZooFeeAnimalMilkable;
+import org.example.elwarriorcito.zoofee.Models.CustomMobs.Interfaces.InventoryHandler;
 import org.example.elwarriorcito.zoofee.Utils.ChatUtils;
 import org.example.elwarriorcito.zoofee.Utils.ItemManager;
 import org.example.elwarriorcito.zoofee.ZooFee;
@@ -22,96 +27,56 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class ZooAnimalStatsGUI implements Listener {
-    private Inventory Menu;
+public class ZooAnimalStatsGUI extends ZooInteractiveGUI {
     private List<ItemStack> Stats;
-    private ZooFeeAnimal Holder;
-    public ZooAnimalStatsGUI(ZooFeeAnimal ZooAnimal){
-        this.Holder = ZooAnimal;
+    private final ZooFeeAnimal Holder;
+    private final GUIManager guiManager;
 
-        this.Menu = Bukkit.createInventory(null, 36, this.Holder.Name);
-
-        ZooFee.getInstance().getServer().getPluginManager().registerEvents(this, ZooFee.getInstance());
+    public ZooAnimalStatsGUI(ZooFeeAnimal holder){
+        super(holder);
+        this.Holder = holder;
+        this.guiManager = ZooFee.getGuiManager();
     }
 
-    public void CreateStats(){
-
-        if(this.Holder instanceof ZooFeeAnimalMilkable && this.Holder.Sex.equals(ZooSex.Female)){
-            ZooFeeAnimalMilkable animal = (ZooFeeAnimalMilkable) this.Holder;
-            ItemStack MilkQuality = ItemManager.BuildItem("&r&f&lMilk Quality: &r&6&l" + animal.MilkQuality.label,
-                    Material.MILK_BUCKET,
-                    1,
-                    new ArrayList<>(
-                            Arrays.asList(
-                                    ChatUtils.setColorName("&r"),
-                                    ChatUtils.setColorName("&r&f&lNext Quality: &r&6&lVery good"))
-                    ),
-                    true);
-
-            this.Menu.setItem(13, MilkQuality);
-        }
-        // Age
-        ItemStack Age = ItemManager.BuildItem("&r&f&lAge: &r&6&l" + this.Holder.Age.label,
-                Material.CLOCK,
-                1,
-                new ArrayList<>(
-                        Arrays.asList(
-                                ChatUtils.setColorName("&r"),
-                                ChatUtils.setColorName("&r&f&lTime left: &r&l" + "45~ days"))
-                ),
-                true);
-
-
-        // Sex
-        Material Sex = this.Holder.Sex.equals(ZooSex.Male) ? Material.STICK : Material.DRIED_KELP;
-        String SexString = this.Holder.Sex.equals(ZooSex.Male) ? "&9&lMale ♂" : "&d&lFemale ♀";
-        ItemStack SexItem = ItemManager.BuildItem("&r&f&lSex: " + SexString, Sex, 1, null, null);
-
-
-        // Ride Animal
-        ItemStack Ride = ItemManager.BuildItem("&r&6&lRide",
-                Material.SADDLE,
-                1,
-                new ArrayList<>(
-                        Arrays.asList(
-                                ChatUtils.setColorName("&r"),
-                                ChatUtils.setColorName("&r&f&l&oWujuuuuuuuuuuu!"))
-                ), true);
-
-        this.Menu.setItem(19, Age);
-        this.Menu.setItem(22, Ride);
-        this.Menu.setItem(25, SexItem);
-
-
+    @Override
+    public void onOpen(InventoryOpenEvent e) {
+        Player p = (Player) e.getPlayer();
+        p.playSound(p.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 0.2f, 1);
+        this.decorate(p);
     }
 
-    public void ShowInventory(Player player){
-        this.CreateStats();
-        player.openInventory(this.Menu);
+    @Override
+    public void onClose(InventoryCloseEvent e) {
+        Player p = (Player) e.getPlayer();
+        p.playSound(p.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 0.2f, 0);
+        this.guiManager.registerHandlerInventory(this.getInventory(), this);
     }
 
-    public void CloseMenu(Player player){
-        player.closeInventory();
+    @Override
+    protected Inventory createMenu(ZooFeeAnimal holder) {
+        return Bukkit.createInventory(null, 9 * 6, holder.Name);
     }
 
-    @EventHandler
-    public void onInventoryInteract(InventoryClickEvent e){
-        if(e.getClickedInventory().equals(this.Menu)){
-            e.setCancelled(true);
-        }
+    public void OpenMenu(Player p){
+        this.guiManager.openGUI(this, p);
+    }
 
-        switch (e.getCurrentItem().getType()) {
-            case SADDLE -> {
-                this.Holder.Ride((Player) e.getWhoClicked());
-                this.CloseMenu((Player) e.getWhoClicked());
-                e.setCancelled(true);
+    @Override
+    public void decorate(Player p) {
+        int inventorySize = this.getInventory().getSize();
+
+        for (int i = 0; i < inventorySize; i++) {
+
+            if(i == 12){
+                ZooGUIButton button = new ZooGUIButton().
+                        creator(player -> new ItemStack(Material.PAINTING)).
+                        consumer(event -> {
+                            Player player = (Player) event.getWhoClicked();
+                        });
+                this.addButton(i, button);
             }
-
+            this.getInventory().setItem(i, new ItemStack(Material.GRAY_STAINED_GLASS_PANE));
         }
-
-
-
-
+        super.decorate(p);
     }
-
 }
