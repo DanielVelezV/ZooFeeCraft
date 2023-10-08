@@ -1,14 +1,12 @@
 package org.example.elwarriorcito.zoofee.Models.CustomMobs.AbstractModels;
 
+import io.lumine.mythic.core.skills.mechanics.AnimateArmorStandMechanic;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDeathEvent;
-import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.inventory.InventoryCloseEvent;
-import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.example.elwarriorcito.zoofee.GUIs.GUIManager;
@@ -16,7 +14,6 @@ import org.example.elwarriorcito.zoofee.Models.CustomMobs.Enums.ZooAges;
 import org.example.elwarriorcito.zoofee.Models.CustomMobs.Enums.ZooSex;
 import org.example.elwarriorcito.zoofee.GUIs.ZooAnimalStatsGUI;
 import org.example.elwarriorcito.zoofee.Models.CustomMobs.Events.AnimalGrowEvent;
-import org.example.elwarriorcito.zoofee.Models.CustomMobs.Interfaces.InventoryHandler;
 import org.example.elwarriorcito.zoofee.Utils.ChatUtils;
 import org.example.elwarriorcito.zoofee.Utils.ZooHolo;
 import org.example.elwarriorcito.zoofee.Utils.ZooMobsSerializer;
@@ -27,21 +24,21 @@ import java.util.List;
 import java.util.Random;
 
 
-public abstract class ZooFeeAnimal implements InventoryHandler, Listener {
+public abstract class ZooFeeAnimal implements Listener {
 
-    protected EntityType type;
     public String Name;
     public ZooAges Age;
     public ZooSex Sex;
     public int Health, Hunger, Thirst, Stress;
     public int MaxHealth, MaxHunger, MaxThirst, MaxStress;
-    protected ZooHolo HolographicName;
+    public ZooHolo HolographicName;
     protected ZooAnimalStatsGUI Menu;
 
     protected Animals entity;
     protected GUIManager menuManager;
-
-
+    private EntityType entityType;
+    public int NumberOfDescendants;
+    public int ResourceProduced;
 
     protected boolean isProductive = false;
 
@@ -50,23 +47,46 @@ public abstract class ZooFeeAnimal implements InventoryHandler, Listener {
                         ZooSex Sex,
                         ZooAges Age){
         ZooFee.getInstance().getServer().getPluginManager().registerEvents(this, ZooFee.getInstance());
+        this.entityType = type;
         this.Sex = Sex;
         this.Age = Age;
         this.Name = Name;
-        this.type = type;
 
-        Health      = Hunger = Thirst = Stress = 20;
+        Health      = Hunger = Thirst = Stress = 12;
         MaxHealth   = MaxHunger = MaxThirst = MaxStress = 20;
-
-
 
 
     }
 
-    public void Spawn(Location location){
-        this.entity = (Animals) location.getWorld().spawnEntity(location, this.type);
+    public ZooFeeAnimal(Animals entity, String Name){
+        ZooFee.getInstance().getServer().getPluginManager().registerEvents(this, ZooFee.getInstance());
+        this.setEntity(entity);
 
-        this.HolographicName = new ZooHolo((LivingEntity) this.entity);
+        this.Name = Name;
+        this.Age = ZooAges.Baby;
+        this.Sex = ZooSex.Male;
+        Health      = Hunger = Thirst = Stress = 12;
+        MaxHealth   = MaxHunger = MaxThirst = MaxStress = 20;
+
+        this.ShowName();
+
+
+        if(this.Age.equals(ZooAges.Baby)){
+            this.entity.setBaby();
+        }
+        this.entity.setPersistent(true);
+        this.entity.setAgeLock(true);
+
+        this.CalculateStats();
+        this.checkOnGrowth();
+
+        this.Menu = new ZooAnimalStatsGUI(this);
+        ZooFee.AllAnimals.add(this);
+    }
+
+    public void Spawn(Location location){
+        this.setEntity((Animals) location.getWorld().spawnEntity(location, this.entityType));
+
         this.ShowName();
 
         if(this.Age.equals(ZooAges.Baby)){
@@ -83,9 +103,6 @@ public abstract class ZooFeeAnimal implements InventoryHandler, Listener {
     }
 
     //region Abstract Methods and Events
-    /**
-    super: Open Inventory
-     */
     @EventHandler
     public void onInteractEvent(PlayerInteractEntityEvent e){
         if(e.getRightClicked() == this.entity && e.getHand().equals(EquipmentSlot.HAND)){
@@ -181,6 +198,14 @@ public abstract class ZooFeeAnimal implements InventoryHandler, Listener {
         this.HolographicName.EditLine(1, ChatUtils.setColorName("&4&l" + this.Age.label + "&r (" + sexEmoji + "&r)"));
     }
     //endregion
+    private void setEntity(Animals e){
+        this.entity = e;
+        this.HolographicName = new ZooHolo(this);
+    }
+
+    public Animals getEntity(){
+        return this.entity;
+    }
 
     //region Data Persistence
     public ZooMobsSerializer getSerializableDataType(){
@@ -193,20 +218,6 @@ public abstract class ZooFeeAnimal implements InventoryHandler, Listener {
     }
     //endregion
 
-    @Override
-    public void onClick(InventoryClickEvent e){
-
-    }
-
-    @Override
-    public void onOpen(InventoryOpenEvent e){
-
-    }
-
-    @Override
-    public void onClose(InventoryCloseEvent e){
-
-    }
 }
 
 

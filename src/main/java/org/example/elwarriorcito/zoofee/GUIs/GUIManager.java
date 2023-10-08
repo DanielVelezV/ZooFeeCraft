@@ -27,7 +27,6 @@ public class GUIManager {
     public void handleClick(InventoryClickEvent e){
         InventoryHandler handler = activeInventories.get(e.getInventory());
         if(handler != null){
-            System.out.println("Clicked");
             handler.onClick(e);
         }
     }

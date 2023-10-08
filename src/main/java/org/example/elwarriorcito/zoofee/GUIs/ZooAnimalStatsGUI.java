@@ -1,9 +1,6 @@
 package org.example.elwarriorcito.zoofee.GUIs;
 
-import org.bukkit.Bukkit;
-import org.bukkit.EntityEffect;
-import org.bukkit.Material;
-import org.bukkit.Sound;
+import org.bukkit.*;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -23,9 +20,7 @@ import org.example.elwarriorcito.zoofee.Utils.ChatUtils;
 import org.example.elwarriorcito.zoofee.Utils.ItemManager;
 import org.example.elwarriorcito.zoofee.ZooFee;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 public class ZooAnimalStatsGUI extends ZooInteractiveGUI {
     private List<ItemStack> Stats;
@@ -36,20 +31,6 @@ public class ZooAnimalStatsGUI extends ZooInteractiveGUI {
         super(holder);
         this.Holder = holder;
         this.guiManager = ZooFee.getGuiManager();
-    }
-
-    @Override
-    public void onOpen(InventoryOpenEvent e) {
-        Player p = (Player) e.getPlayer();
-        p.playSound(p.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 0.2f, 1);
-        this.decorate(p);
-    }
-
-    @Override
-    public void onClose(InventoryCloseEvent e) {
-        Player p = (Player) e.getPlayer();
-        p.playSound(p.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 0.2f, 0);
-        this.guiManager.registerHandlerInventory(this.getInventory(), this);
     }
 
     @Override
@@ -67,11 +48,25 @@ public class ZooAnimalStatsGUI extends ZooInteractiveGUI {
 
         for (int i = 0; i < inventorySize; i++) {
 
-            if(i == 12){
+            if(i == 10){
+
+                var Button = ItemManager.BuildItem("&6&lStats",
+                        Material.BOOK,
+                        1,
+                        List.of(
+                                String.format("%s %s", "&r&lHealth: ", ChatUtils.getStringProgressBar(Holder.MaxHealth, Holder.Health)),
+                                String.format("%s %s", "&r&lThirst: ", ChatUtils.getStringProgressBar(Holder.MaxThirst, Holder.Thirst)),
+                                String.format("%s %s", "&r&lHunger:", ChatUtils.getStringProgressBar(Holder.MaxHunger, Holder.Hunger))
+
+                        ),
+                        true);
+
+
                 ZooGUIButton button = new ZooGUIButton().
-                        creator(player -> new ItemStack(Material.PAINTING)).
+                        creator(player -> Button).
                         consumer(event -> {
                             Player player = (Player) event.getWhoClicked();
+                            this.guiManager.openGUI(new ZooStatsInfoGUI(this.Holder), player);
                         });
                 this.addButton(i, button);
             }

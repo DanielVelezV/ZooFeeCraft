@@ -1,5 +1,7 @@
 package org.example.elwarriorcito.zoofee.Utils;
 
+import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
@@ -8,9 +10,9 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitScheduler;
+import org.example.elwarriorcito.zoofee.Models.CustomMobs.AbstractModels.ZooFeeAnimal;
 import org.example.elwarriorcito.zoofee.ZooFee;
 
-import javax.xml.stream.Location;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -18,12 +20,12 @@ import java.util.List;
 
 public class ZooHolo implements Listener {
 
-    public LivingEntity holder;
+    public ZooFeeAnimal holder;
 
 
     private List<ArmorStand> lines = new ArrayList<>();
 
-    public ZooHolo(LivingEntity Holder){
+    public ZooHolo(ZooFeeAnimal Holder){
         this.holder = Holder;
         this.FollowHolder();
 
@@ -31,7 +33,9 @@ public class ZooHolo implements Listener {
     }
 
     public void AddLine(String line){
-        ArmorStand entity = (ArmorStand) this.holder.getWorld().spawnEntity(this.holder.getLocation(), EntityType.ARMOR_STAND);
+        World world = this.holder.getEntity().getWorld();
+        Location loc = this.holder.getEntity().getLocation();
+        ArmorStand entity = (ArmorStand)    world.spawnEntity(loc, EntityType.ARMOR_STAND);
         
         entity.setGravity(false);
         entity.setCustomName(line);
@@ -59,7 +63,7 @@ public class ZooHolo implements Listener {
             public void run() {
                 double height = 2;
                 for (ArmorStand i : lines){
-                    i.teleport(holder.getLocation().add(0, height, 0));
+                    i.teleport(holder.getEntity().getLocation().add(0, height, 0));
                     height -= 0.3;
                 }
             }

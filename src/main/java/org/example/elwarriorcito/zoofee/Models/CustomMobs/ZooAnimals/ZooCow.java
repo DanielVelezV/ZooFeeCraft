@@ -1,5 +1,6 @@
 package org.example.elwarriorcito.zoofee.Models.CustomMobs.ZooAnimals;
 
+import org.bukkit.entity.Animals;
 import org.bukkit.entity.EntityType;
 
 import org.example.elwarriorcito.zoofee.Models.CustomMobs.Enums.ZooAges;
@@ -15,6 +16,11 @@ public class ZooCow extends ZooFeeAnimalMilkable {
                 ChatUtils.setColorName("&8&lZoo" + "&f&lCow"),
                 sex,
                 age);
+
+    }
+
+    public ZooCow(Animals e){
+        super(e, ChatUtils.setColorName("&8&lZoo" + "&f&lCow"));
 
     }
 

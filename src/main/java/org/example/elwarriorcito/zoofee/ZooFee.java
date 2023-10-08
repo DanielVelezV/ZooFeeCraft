@@ -1,24 +1,25 @@
 package org.example.elwarriorcito.zoofee;
 
 import com.google.gson.Gson;
-import com.mojang.datafixers.TypeRewriteRule;
 import org.bukkit.Bukkit;
+import org.bukkit.entity.Animals;
+import org.bukkit.entity.EntityType;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.player.PlayerInteractEntityEvent;
-import org.bukkit.event.player.PlayerSpawnChangeEvent;
+import org.bukkit.event.world.ChunkLoadEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.example.elwarriorcito.zoofee.Commands.SpawnZooMobCommand;
 import org.example.elwarriorcito.zoofee.Commands.SpawnZooMobTabCompleter;
 import org.example.elwarriorcito.zoofee.GUIs.GUIListener;
 import org.example.elwarriorcito.zoofee.GUIs.GUIManager;
 import org.example.elwarriorcito.zoofee.Models.CustomMobs.AbstractModels.ZooFeeAnimal;
+import org.example.elwarriorcito.zoofee.Models.CustomMobs.ZooAnimals.ZooCow;
 import org.example.elwarriorcito.zoofee.Utils.ZooMobsSerializer;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public final class ZooFee extends JavaPlugin{
+public final class ZooFee extends JavaPlugin implements Listener {
     public static ZooFee instance = null;
     public static List<ZooFeeAnimal> AllAnimals = new ArrayList<>();
     private int growTaskId;
@@ -35,26 +36,21 @@ public final class ZooFee extends JavaPlugin{
         GUIListener guiListener = new GUIListener(guiManager);
 
         this.getServer().getPluginManager().registerEvents(guiListener, this);
+        this.getServer().getPluginManager().registerEvents(this, this);
 
         growTaskId = Bukkit.getScheduler().scheduleSyncRepeatingTask(this, this::TryGrow, 0, 20 * 5);
+
 
     }
 
     @Override
     public void onDisable() {
-        Gson gson = new Gson();
-        List<ZooMobsSerializer> a = new ArrayList<>();
-        for (ZooFeeAnimal b : AllAnimals){
-            a.add(b.getSerializableDataType());
+        for (ZooFeeAnimal a : AllAnimals){
+            a.HolographicName.removeAll();
         }
-
-        String serielized = gson.toJson(a);
-
-        System.out.println(serielized);
-
         Bukkit.getScheduler().cancelTask(growTaskId);
 
-//
+
     }
 
     public static ZooFee getInstance(){
@@ -70,6 +66,18 @@ public final class ZooFee extends JavaPlugin{
     public static GUIManager getGuiManager(){
         return guiManager;
     }
+
+    @EventHandler
+    public void onChunkLoad(ChunkLoadEvent e){
+        var Entities = e.getChunk().getEntities();
+
+        for (int i = 0; i < Entities.length; i++) {
+            if(Entities[i].getType() == EntityType.COW){
+                ZooCow f = new ZooCow((Animals) Entities[i]);
+            }
+        }
+    }
+
 
 
 

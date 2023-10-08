@@ -4,6 +4,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.Animals;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
@@ -40,6 +41,12 @@ public abstract class ZooFeeAnimalMilkable extends ZooFeeAnimal{
 
         this.MilkQuality = ZooMilkQuality.Very_Good;
     }
+    public ZooFeeAnimalMilkable(Animals entity, String Name) {
+        super(entity, Name);
+
+        this.MilkQuality = ZooMilkQuality.Very_Good;
+    }
+
 
     private void LowerCooldown(){
         if(this.CurrentMilkingCoolDown > 0){
@@ -164,5 +171,6 @@ public abstract class ZooFeeAnimalMilkable extends ZooFeeAnimal{
         }
     }
     //endregion
+
 
 }
